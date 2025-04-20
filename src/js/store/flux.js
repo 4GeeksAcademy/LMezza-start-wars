@@ -3,101 +3,64 @@ const getState = ({ getStore, getActions, setStore }) => {
 		store: {
 			people: [],
 			planets: [],
-			vehicles: [],
-			//items: {}
+			starships: [],
+			endPoints: ["people", "planets", "starships"],
+			infoDetail: [],
+			favoriteArray: [],
 		},
 		actions: {
-			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
-			},
-			// getInfoItem: async () => {
-			// 	const requestOptions = {
-			// 		method: "GET",
-			// 		redirect: "follow"
-			// 	};
-		
-			// 	try {
-			// 		const response = await fetch(`https://www.swapi.tech/api/${params.categories}/${params.id}`, requestOptions);
-			// 		const data = await response.json();
-			// 		setStore({items:data.result})
-			// 	} catch (error) {
-			// 		console.error(error);
-			// 	};
-			//  },
-			getInfoPeople: async () => {
-				const requestOptions = {
-					method: "GET",
-					redirect: "follow"
-				};
-		
-				try {
-					const response = await fetch("https://www.swapi.tech/api/vehicles", requestOptions);
-					const data = await response.json();
-					setStore({vehicles:data.results})
-				} catch (error) {
-					console.error(error);
-				};
-			},
-			getVehicles: async () => {
+			getInfoCard: async (endPoint) => {
 				const requestOptions = {
 					method: "GET",
 					redirect: "follow"
 				};
 				try {
-					const response = await fetch("https://www.swapi.tech/api/vehicles", requestOptions);
-					const data = await response.json();
-					setStore({vehicles:data.results})
+					if (JSON.parse(localStorage.getItem((endPoint))) == null) {
+						const response = await fetch(`https://www.swapi.tech/api/${endPoint}`, requestOptions);
+						const result = await response.json();
+						const detailedPeople = await Promise.all
+							(
+								result.results.map(async (personAllInfo) => {
+									const detailResponse = await fetch(`${personAllInfo.url}`, requestOptions);
+									const detailResult = await detailResponse.json();
+									return detailResult.result;
+								})
+							)
+						localStorage.setItem((endPoint), JSON.stringify(detailedPeople));
+						setStore({ [endPoint]: detailedPeople })
+					} else {
+						setStore({ [endPoint]: JSON.parse(localStorage.getItem((endPoint))) })
+					}
 				} catch (error) {
 					console.error(error);
-				};
+				}
 			},
-			getPlanets: async () => {
+			getDetails: async (endPoint) => {
 				const requestOptions = {
 					method: "GET",
 					redirect: "follow"
 				};
-		
 				try {
-					const response = await fetch("https://www.swapi.tech/api/planets", requestOptions);
-					const data = await response.json();
-					setStore({planets:data.results})
+					const response = await fetch(`${endPoint}`, requestOptions);
+					const result = await response.json();
+					setStore({ infoDetail: result.result.properties });
 				} catch (error) {
 					console.error(error);
-				};
+				}
 			},
-			getPeople: async () => {
-				const requestOptions = {
-					method: "GET",
-					redirect: "follow"
-				};
-		
-				try {
-					const response = await fetch("https://www.swapi.tech/api/people", requestOptions);
-					const data = await response.json();
-					//setPeople(data.results)
-					setStore({people:data.results});
-					
-				} catch (error) {
-					console.error(error);
-				};
+			setFavoriteArray: (newFavorite) => {
+				const store = getStore()
+				setStore({ favoriteArray: store.favoriteArray.concat([newFavorite]) })
 			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
-
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
+			deleteFavorite: (name) => {
+				const store = getStore()
+				const newFavoriteArray = store.favoriteArray.filter((element) => {
+					return name !== element
 				});
-
-				//reset the global store
-				setStore({ demo: demo });
-			}
+				setStore({ favoriteArray: newFavoriteArray })
+			},
 		}
-	};
-};
+	}
+}
 
 export default getState;

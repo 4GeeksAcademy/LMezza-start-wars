@@ -1,46 +1,17 @@
-import React, { useEffect, useState } from "react";
-//import { Context } from "../store/appContext";
-import { useParams } from "react-router";
-import { InfoCard } from "../component/infoCard";
+import React from "react";
+import { PeopleInfo } from "../component/PeopleInfo";
+import { PlanetInfo } from "../component/PlanetInfo";
+import { NavsInfo } from "../component/NavsInfo";
+import { useLocation, useParams } from "react-router-dom";
 
-
-
-export const Item = () => {
-
-    //const {store, actions} = useContext()
-    let params = useParams()
-    //console.log(params);
-    const [items, setItems] = useState({})
-
-    console.log(items);
-    
-
-    async function getInfoItem() {
-        const requestOptions = {
-            method: "GET",
-            redirect: "follow"
-        };
-
-        try {
-            const response = await fetch(`https://www.swapi.tech/api/${params.categories}/${params.id}`, requestOptions);
-            const data = await response.json();
-            setItems(data)
-        } catch (error) {
-            console.error(error);
-        };
+export const InfoItem = () => {
+    const params = useParams()
+    const path = useLocation()
+    if (path.pathname.includes("people")) {
+        return <PeopleInfo params={params} />
+    } else if (path.pathname.includes("planets")) {
+        return <PlanetInfo params={params} />
+    } else if (path.pathname.includes("starships")) {
+        return <NavsInfo params={params} />
     }
-
-
-
-    useEffect(() => {
-        getInfoItem()
-    }, [])
-
-    return (
-        <div className="text-center mx-auto">
-            <h1>Item</h1>
-            <InfoCard />
-
-        </div >
-    )
-};
+}

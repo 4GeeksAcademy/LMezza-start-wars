@@ -1,34 +1,56 @@
-import React, { useEffect, useState, useContext } from "react";
-import { Context } from "../store/appContext"
-import { Card } from "../component/card";
+import React, { useContext, useEffect, useState } from "react";
 import "../../styles/home.css";
-
+import { Card } from "../component/card";
+import { Context } from "../store/appContext";
+import { PlaceholderCard } from "../component/ placeholderCard";
 
 export const Home = () => {
-	const {store, actions} = useContext(Context)
-
-
+	const { store, actions } = useContext(Context)
 
 	useEffect(() => {
-		actions.getPeople()
-		actions.getPlanets()
-		actions.getVehicles()
+		store.endPoints.map((endPoint) => { actions.getInfoCard(endPoint) })
 	}, [])
-
 	return (
-		<div className="container text-center my-5">
-			<h1>Characters</h1>
-			<div className="container d-flex overflow-auto mb-5" style={{ gap: "1rem" }}>
-				{store.people.length > 0 ? store.people.map((item) => <Card key={item.uid} name={item.name} id={item.uid} categories={"people"} />) : null}
+		<div className="container mt-3">
+			<div className="row d-flex justify-content-center">
+				<h2>Personajes</h2>
+				<div className="scrollmenu row">
+					{store.people.length > 0 ? store.people.map((people) => {
+						return (
+							<Card name={people.properties.name} uid={people.uid} key={people.uid} url={people.properties.url} gender={`Gender: ${people.properties.gender}`}
+								hair_color={`Hair Color: ${people.properties.hair_color}`}
+								eye_color={`Eye Color: ${people.properties.eye_color}`}
+							/>
+						)
+					}) : <PlaceholderCard />}
+				</div>
 			</div>
-			<h1>Planets</h1>
-			<div className="container d-flex overflow-auto mb-5" style={{ gap: "1rem" }}>
-				{store.planets.length > 0 ? store.planets.map((item) => <Card key={item.uid} name={item.name} id={item.uid} categories={"planets"} />) : null}
+			<div className="row">
+				<h2>Planetas</h2>
+				<div className="scrollmenu row">
+					{store.planets.length > 0 ? store.planets.map((planet) => {
+						return (
+							<Card name={planet.properties.name} uid={planet.uid} key={planet.uid} url={planet.properties.url}
+								population={`Population: ${planet.properties.population}`}
+								terrain={`Terrain: ${planet.properties.terrain}`}
+								climate={`Climate: ${planet.properties.climate}`} />
+						)
+					}) : <PlaceholderCard />}
+				</div>
 			</div>
-			<h1>Vehicles</h1>
-			<div className="container d-flex overflow-auto mb-5" style={{ gap: "1rem" }}>
-				{store.vehicles.length > 0 ? store.vehicles.map((item) => <Card key={item.uid} name={item.name} id={item.uid} categories={"vehicles"} />) : null}
+			<div className="row">
+				<h2>Navs</h2>
+				<div className="scrollmenu row">
+					{store.starships.length > 0 ? store.starships.map((starship) => {
+						return (
+							<Card name={starship.properties.name} uid={starship.uid} key={starship.uid} url={starship.properties.url}
+								passengers={`Passengers: ${starship.properties.passengers}`}
+								model={`Model: ${starship.properties.model}`}
+								cargo_capacity={`Cargo Capacity: ${starship.properties.cargo_capacity}`} />
+						)
+					}) : <PlaceholderCard />}
+				</div>
 			</div>
 		</div>
 	)
-};
+} 
